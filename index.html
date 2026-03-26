@@ -262,6 +262,7 @@
 
           <!-- Graph Container -->
           <div class="flex-1 relative bg-background/50 rounded-lg border border-border/50 overflow-hidden graph-grid min-h-[300px]">
+            <canvas id="timeCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
             <!-- Axis Labels -->
             <div class="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono">
               Amplitude
@@ -279,12 +280,7 @@
             </div>
 
             <!-- Placeholder text -->
-            <div class="absolute inset-8 flex items-center justify-center">
-              <p class="text-muted-foreground/50 text-sm font-mono">
-                Signal visualization will render here
-              </p>
-            </div>
-
+            <div id="placeholder-text" class="absolute inset-8 flex items-center justify-center hidden">
             <!-- Scale markers -->
             <div class="absolute top-2 right-2 text-xs text-muted-foreground/50 font-mono">+1.0</div>
             <div class="absolute bottom-2 right-2 text-xs text-muted-foreground/50 font-mono">-1.0</div>
@@ -445,73 +441,6 @@
 
     </div>
   </main>
-
-  <script>
-    // DOM Elements
-    const signalFreqSlider = document.getElementById('signal-frequency');
-    const samplingRateSlider = document.getElementById('sampling-rate');
-    const signalFreqValue = document.getElementById('signal-freq-value');
-    const samplingRateValue = document.getElementById('sampling-rate-value');
-    const insightSignalFreq = document.getElementById('insight-signal-freq');
-    const insightSamplingRate = document.getElementById('insight-sampling-rate');
-    const insightNyquistRate = document.getElementById('insight-nyquist-rate');
-    const statusNoAliasing = document.getElementById('status-no-aliasing');
-    const statusAliasing = document.getElementById('status-aliasing');
-    const btnCorrect = document.getElementById('btn-correct');
-    const btnAliasing = document.getElementById('btn-aliasing');
-    const btnNyquist = document.getElementById('btn-nyquist');
-
-    // Update UI function
-    function updateUI() {
-      const signalFreq = parseInt(signalFreqSlider.value);
-      const samplingRate = parseInt(samplingRateSlider.value);
-      const nyquistRate = signalFreq * 2;
-      const isAliasing = samplingRate < nyquistRate;
-
-      // Update display values
-      signalFreqValue.textContent = signalFreq + ' Hz';
-      samplingRateValue.textContent = samplingRate + ' Hz';
-      insightSignalFreq.textContent = signalFreq;
-      insightSamplingRate.textContent = samplingRate;
-      insightNyquistRate.textContent = nyquistRate;
-
-      // Update status indicator
-      if (isAliasing) {
-        statusNoAliasing.classList.add('hidden');
-        statusAliasing.classList.remove('hidden');
-        statusAliasing.classList.add('flex');
-      } else {
-        statusAliasing.classList.add('hidden');
-        statusAliasing.classList.remove('flex');
-        statusNoAliasing.classList.remove('hidden');
-      }
-    }
-
-    // Event listeners for sliders
-    signalFreqSlider.addEventListener('input', updateUI);
-    samplingRateSlider.addEventListener('input', updateUI);
-
-    // Preset buttons
-    btnCorrect.addEventListener('click', function() {
-      signalFreqSlider.value = 10;
-      samplingRateSlider.value = 50;
-      updateUI();
-    });
-
-    btnAliasing.addEventListener('click', function() {
-      signalFreqSlider.value = 40;
-      samplingRateSlider.value = 30;
-      updateUI();
-    });
-
-    btnNyquist.addEventListener('click', function() {
-      signalFreqSlider.value = 25;
-      samplingRateSlider.value = 50;
-      updateUI();
-    });
-
-    // Initialize
-    updateUI();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
