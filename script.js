@@ -16,33 +16,69 @@
     function updateUI() {
       const signalFreq = parseInt(signalFreqSlider.value);
       const samplingRate = parseInt(samplingRateSlider.value);
-      const nyquistRate = signalFreq * 2;
-      let aliasFreq = signalFreq;
+      // ===== Nyquist frequency (display purpose) =====
+        const nyquistFreq = samplingRate / 2;
 
-        if (samplingRate < nyquistRate) {
-            const k = Math.round(signalFreq / samplingRate);
-            aliasFreq = Math.abs(signalFreq - k * samplingRate);
+        // ===== Aliasing condition =====
+        const isAliasing = samplingRate < 2 * signalFreq;
+        let status = "no-aliasing";
+
+        if (samplingRate < 2 * signalFreq) {
+            if (samplingRate === signalFreq) {
+                status = "critical"; // edge case
+            } else {
+                status = "aliasing";
+            }
         }
-      const isAliasing = samplingRate < nyquistRate;
+
+        // ===== Alias frequency =====
+        let aliasFreq = signalFreq;
+        
+        if (isAliasing) {
+            let f = signalFreq;
+
+            while (f > samplingRate / 2) {
+                f = Math.abs(f - samplingRate);
+            }
+
+            aliasFreq = f;
+        }
 
       // Update display values
       signalFreqValue.textContent = signalFreq + ' Hz';
       samplingRateValue.textContent = samplingRate + ' Hz';
       insightSignalFreq.textContent = signalFreq;
       insightSamplingRate.textContent = samplingRate;
-      insightNyquistRate.textContent = nyquistRate;
+      insightNyquistRate.textContent = nyquistFreq.toFixed(1);
 
-      // Update status indicator
-      if (isAliasing) {
-        statusNoAliasing.classList.add('hidden');
-        statusAliasing.classList.remove('hidden');
-        statusAliasing.classList.add('flex');
-      } else {
+
+      // ===== Sampling Status UI =====
+    if (samplingRate < 2 * signalFreq) {
+        if (samplingRate === signalFreq) {
+            // CRITICAL CASE
+            statusAliasing.classList.remove('hidden');
+            statusNoAliasing.classList.add('hidden');
+
+            statusAliasing.innerHTML = `
+            <span class="text-yellow-400 font-semibold">Critical Sampling</span>
+            Signal collapses to DC (0 Hz)
+            `;
+        } else {
+            // ALIASING
+            statusAliasing.classList.remove('hidden');
+            statusNoAliasing.classList.add('hidden');
+
+            statusAliasing.innerHTML = `
+            <span class="text-red-500 font-semibold">Aliasing Occurring</span>
+            Sampling rate is below Nyquist rate
+            `;
+        }
+    } else {
+        // NO ALIASING
         statusAliasing.classList.add('hidden');
-        statusAliasing.classList.remove('flex');
         statusNoAliasing.classList.remove('hidden');
-      }
-      drawSineWave();
+    }
+      drawSineWave(signalFreq, samplingRate, isAliasing, aliasFreq);
       document.getElementById("alias-frequency").textContent = aliasFreq.toFixed(1) + " Hz";
     }
 
@@ -79,10 +115,10 @@
     canvas.height = canvas.clientHeight;
   }
 
-  function drawSineWave() {
+  function drawSineWave(signalFreq, samplingRate, isAliasing, aliasFreq) {
     resizeCanvas();
 
-    const signalFreq = parseFloat(signalFreqSlider.value);
+    // const signalFreq = parseFloat(signalFreqSlider.value);
     const width = canvas.width;
     const height = canvas.height;
 
@@ -109,28 +145,36 @@
     ctx.stroke();
 
     // ===== DRAW SAMPLED POINTS =====
-        const samplingRate = parseFloat(samplingRateSlider.value);
-        const duration = 1; // seconds
+    const N = 128;
+    const duration = N / samplingRate;
 
-        const Ts = 1 / samplingRate;
+    const samplesArray = [];
+    const samples = [];
 
-        ctx.fillStyle = "#a78bfa"; // purple
+    // ✅ consistent frequency
+    const effectiveFreq = isAliasing ? aliasFreq : signalFreq;
+    const freqRatio = effectiveFreq / samplingRate;
 
-        const samples = [];
+    for (let n = 0; n < N; n++) {
 
-        for (let t = 0; t <= duration; t += Ts) {
-            const x = t * width;
+        const window = 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1)));
 
-            const y =
-                centerY -
-                amplitude * Math.sin(2 * Math.PI * signalFreq * t);
+        const value =
+            Math.sin(2 * Math.PI * freqRatio * n) * window;
 
-            samples.push({ x, y });
+        samplesArray.push(value);
 
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2 * Math.PI);
-            ctx.fill();
-        }
+        const t = n / samplingRate;
+        const x = (t / duration) * width;
+        const y = centerY - amplitude * value;
+
+        samples.push({ x, y });
+
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+        
 
         // ===== RECONSTRUCTED SIGNAL (LINEAR INTERPOLATION) =====
         ctx.beginPath();
@@ -150,12 +194,11 @@
         ctx.stroke();
 
         // ===== IDEAL ALIAS SIGNAL (REFERENCE) =====
-        // const samplingRate = parseFloat(samplingRateSlider.value);
-        const nyquistRate = signalFreq * 2;
 
-        if (samplingRate < nyquistRate) {
-            const k = Math.round(signalFreq / samplingRate);
-            const aliasFreq = Math.abs(signalFreq - k * samplingRate);
+        if (isAliasing) {
+            const k = Math.floor(signalFreq / samplingRate);
+            // const aliasFreq = Math.abs(signalFreq - k * samplingRate);
+            const effectiveAlias = aliasFreq;
 
             ctx.beginPath();
             ctx.lineWidth = 2;
@@ -174,7 +217,93 @@
 
             ctx.stroke();
         }
+
+        drawFrequencyDomain(samplesArray, samplingRate);
   }
+
+  function computeDFT(signal) {
+        const N = signal.length;
+        const spectrum = [];
+
+        for (let k = 0; k < N; k++) {
+            let real = 0;
+            let imag = 0;
+
+            for (let n = 0; n < N; n++) {
+                const angle = (2 * Math.PI * k * n) / N;
+                real += signal[n] * Math.cos(angle);
+                imag -= signal[n] * Math.sin(angle);
+            }
+
+            spectrum.push(Math.sqrt(real * real + imag * imag));
+        }
+
+        return spectrum;
+    }
+
+    const freqCanvas = document.getElementById("freqCanvas");
+    const freqCtx = freqCanvas.getContext("2d");
+
+    function drawFrequencyDomain(signal, samplingRate) {
+    const width = freqCanvas.clientWidth;
+    const height = freqCanvas.clientHeight;
+
+    freqCanvas.width = width;
+    freqCanvas.height = height;
+
+    const spectrum = computeDFT(signal);
+    const N = signal.length;
+
+    freqCtx.clearRect(0, 0, width, height);
+
+    // find peak
+    let maxIndex = 0;
+    for (let i = 0; i < N / 2; i++) {
+        if (spectrum[i] > spectrum[maxIndex]) {
+            maxIndex = i;
+        }
+    }
+
+    const maxMag = Math.max(...spectrum);
+
+    // draw bars
+    for (let i = 0; i < N / 2; i++) {
+        const freq = (i * samplingRate) / N;
+        const padding = 20;
+        const x = padding + (freq / (samplingRate / 2)) * (width - 2 * padding);
+
+        const magnitude = spectrum[i];
+        const barHeight = (magnitude / maxMag) * height * 0.8;
+
+        freqCtx.fillStyle = i === maxIndex ? "#ef4444" : "#22d3ee";
+        if (i === maxIndex) {
+            const peakFreq = (i * samplingRate) / N;
+
+            freqCtx.fillStyle = "#ef4444";
+            freqCtx.fillText(
+                peakFreq.toFixed(1) + " Hz",
+                x,
+                height - barHeight - 10
+            );
+        }
+        freqCtx.fillRect(x, height - barHeight, 2, barHeight);
+    }
+
+    // ===== Nyquist line =====
+    freqCtx.beginPath();
+    freqCtx.setLineDash([5, 5]);
+    freqCtx.strokeStyle = "#888";
+
+    freqCtx.moveTo(width, 0);
+    freqCtx.lineTo(width, height);
+
+    freqCtx.stroke();
+    freqCtx.setLineDash([]);
+
+    freqCtx.fillStyle = "#888";
+    freqCtx.font = "12px monospace";
+    freqCtx.fillText("Nyquist", width - 60, 15);
+}
   window.addEventListener("resize", drawSineWave);
 
    // Initialize

@@ -331,13 +331,13 @@
             <!-- Nyquist Rate -->
             <div class="p-3 md:p-4 rounded-lg bg-background/50 border border-border/50">
               <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                Nyquist Rate
+                Nyquist Frequency
               </p>
               <p class="text-xl md:text-2xl font-mono font-bold text-chart-4">
                 <span id="insight-nyquist-rate">20</span> <span class="text-sm font-normal">Hz</span>
               </p>
               <p class="text-xs text-muted-foreground mt-1">
-                (2 x Signal Frequency)
+                (Fs / 2)
               </p>
             </div>
           </div>
@@ -425,30 +425,21 @@
         </div>
 
         <!-- Graph Container -->
-        <div class="relative bg-background/50 rounded-lg border border-border/50 overflow-hidden graph-grid h-[200px]">
+        <div class="relative bg-background/50 rounded-lg border border-border/50 overflow-visible graph-grid h-[200px]">
+          <canvas id="freqCanvas" class="absolute inset-0 w-full h-full"></canvas>
           <!-- Axis Labels -->
-          <div class="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono">
+          <div class="absolute left-0 -translate-x-full top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono pl-2">
             Magnitude
           </div>
-          <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground font-mono">
+          <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full text-xs text-muted-foreground font-mono pt-2">
             Frequency (Hz)
           </div>
 
           <!-- Baseline -->
           <div class="absolute bottom-10 left-8 right-8 h-px bg-border"></div>
 
-          <!-- Nyquist marker -->
-          <div class="absolute bottom-10 left-1/2 w-px h-[calc(100%-50px)] border-l border-dashed border-chart-4/50"></div>
-          <div class="absolute top-2 left-1/2 -translate-x-1/2 text-xs text-chart-4/70 font-mono">
-            Nyquist
-          </div>
-
           <!-- Placeholder text -->
-          <div class="absolute inset-8 flex items-center justify-center">
-            <p class="text-muted-foreground/50 text-sm font-mono">
-              FFT spectrum will render here
-            </p>
-          </div>
+          <div id="fft-placeholder" class="absolute inset-8 flex items-center justify-center hidden">
 
           <!-- Scale markers -->
           <div class="absolute bottom-2 left-8 text-xs text-muted-foreground/50 font-mono">0</div>
