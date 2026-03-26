@@ -17,6 +17,12 @@
       const signalFreq = parseInt(signalFreqSlider.value);
       const samplingRate = parseInt(samplingRateSlider.value);
       const nyquistRate = signalFreq * 2;
+      let aliasFreq = signalFreq;
+
+        if (samplingRate < nyquistRate) {
+            const k = Math.round(signalFreq / samplingRate);
+            aliasFreq = Math.abs(signalFreq - k * samplingRate);
+        }
       const isAliasing = samplingRate < nyquistRate;
 
       // Update display values
@@ -37,6 +43,7 @@
         statusNoAliasing.classList.remove('hidden');
       }
       drawSineWave();
+      document.getElementById("alias-frequency").textContent = aliasFreq.toFixed(1) + " Hz";
     }
 
     // Event listeners for sliders
@@ -141,6 +148,32 @@
         }
 
         ctx.stroke();
+
+        // ===== IDEAL ALIAS SIGNAL (REFERENCE) =====
+        // const samplingRate = parseFloat(samplingRateSlider.value);
+        const nyquistRate = signalFreq * 2;
+
+        if (samplingRate < nyquistRate) {
+            const k = Math.round(signalFreq / samplingRate);
+            const aliasFreq = Math.abs(signalFreq - k * samplingRate);
+
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#ef4444"; // red
+
+            for (let x = 0; x < width; x++) {
+                const t = x / width;
+
+                const y =
+                centerY -
+                amplitude * Math.sin(2 * Math.PI * aliasFreq * t);
+
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+
+            ctx.stroke();
+        }
   }
   window.addEventListener("resize", drawSineWave);
 

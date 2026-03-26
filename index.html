@@ -237,7 +237,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-4 md:gap-6">
         
         <!-- Time Domain Graph -->
-        <section class="bg-card border border-border rounded-xl p-4 md:p-6 shadow-lg flex flex-col">
+        <section class="bg-card border border-border rounded-xl p-4 md:p-6 shadow-lg flex flex-col pl-10">
           <!-- Header -->
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h2 class="text-lg font-semibold text-foreground">
@@ -245,6 +245,10 @@
             </h2>
             <!-- Legend -->
             <div class="flex flex-wrap items-center gap-3 md:gap-4 text-xs md:text-sm">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-0.5 bg-red-500 rounded-full"></div>
+                <span class="text-muted-foreground">Aliased Signal</span>
+              </div>
               <div class="flex items-center gap-2">
                 <div class="w-4 h-0.5 bg-primary rounded-full"></div>
                 <span class="text-muted-foreground">Original Signal</span>
@@ -261,10 +265,10 @@
           </div>
 
           <!-- Graph Container -->
-          <div class="flex-1 relative bg-background/50 rounded-lg border border-border/50 overflow-hidden graph-grid min-h-[300px]">
+          <div class="flex-1 relative bg-background/50 rounded-lg border border-border/50 overflow-visible graph-grid min-h-[300px]">
             <canvas id="timeCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
             <!-- Axis Labels -->
-            <div class="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono">
+            <div class="absolute left-0 -translate-x-full top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono pl-2">
               Amplitude
             </div>
             <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground font-mono">
@@ -337,6 +341,19 @@
               </p>
             </div>
           </div>
+
+          <div class="p-3 md:p-4 rounded-lg bg-background/50 border border-border/50">
+            <p class="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+              Aliased Frequency
+            </p>
+            <p id="alias-frequency" class="text-xl md:text-2xl font-mono font-bold text-destructive">
+              0 Hz
+            </p>
+          </div>
+
+          <p class="text-xs text-destructive mt-2">
+            Reconstructed signal matches aliased frequency, not original signal
+          </p>
 
           <!-- Status Indicator -->
           <div class="mt-4 md:mt-6 pt-4 border-t border-border">
