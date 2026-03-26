@@ -109,17 +109,38 @@
 
         ctx.fillStyle = "#a78bfa"; // purple
 
+        const samples = [];
+
         for (let t = 0; t <= duration; t += Ts) {
-        const x = t * width;
+            const x = t * width;
 
-        const y =
-            centerY -
-            amplitude * Math.sin(2 * Math.PI * signalFreq * t);
+            const y =
+                centerY -
+                amplitude * Math.sin(2 * Math.PI * signalFreq * t);
 
-        ctx.beginPath();
-        ctx.arc(x, y, 3, 0, 2 * Math.PI);
-        ctx.fill();
+            samples.push({ x, y });
+
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fill();
         }
+
+        // ===== RECONSTRUCTED SIGNAL (LINEAR INTERPOLATION) =====
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#22c55e"; // green
+
+        for (let i = 0; i < samples.length; i++) {
+        const point = samples[i];
+
+        if (i === 0) {
+            ctx.moveTo(point.x, point.y);
+        } else {
+            ctx.lineTo(point.x, point.y);
+        }
+        }
+
+        ctx.stroke();
   }
   window.addEventListener("resize", drawSineWave);
 
