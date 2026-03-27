@@ -1,16 +1,16 @@
-# 🎯 Sampling & Aliasing Simulator
+# Sampling & Aliasing Simulator
 
 An interactive visual simulator that demonstrates how improper sampling leads to **aliasing**, a fundamental concept in signal processing.
 
 ---
 
-## 🚀 Live Demo
+## Live Demo
 
-👉 (https://aliasing-simulator.vercel.app/)
+--> (https://aliasing-simulator.vercel.app/)
 
 ---
 
-## 📌 Overview
+## Overview
 
 Sampling is the process of converting a continuous-time signal into discrete samples.
 If the sampling rate is too low, the signal gets **misinterpreted**, leading to **aliasing**.
@@ -24,7 +24,7 @@ This simulator provides an intuitive, real-time visualization of:
 
 ---
 
-## 🧠 Key Concepts Demonstrated
+## Key Concepts Demonstrated
 
 * **Nyquist Theorem**
   A signal must be sampled at least **2× its frequency** to avoid aliasing.
@@ -37,7 +37,7 @@ This simulator provides an intuitive, real-time visualization of:
 
 ---
 
-## ✨ Features
+## Features
 
 * 🎛️ Interactive sliders for:
 
@@ -70,7 +70,7 @@ This simulator provides an intuitive, real-time visualization of:
 
 ---
 
-## 🖼️ How It Works
+## How It Works
 
 ### 1. Signal Generation
 
@@ -100,7 +100,7 @@ A Discrete Fourier Transform (DFT) is used to compute the signal spectrum.
 
 ---
 
-## 📊 Example
+## Example
 
 | Signal | Sampling | Observed |
 | ------ | -------- | -------- |
@@ -110,7 +110,7 @@ A Discrete Fourier Transform (DFT) is used to compute the signal spectrum.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **HTML5 Canvas** — Visualization
 * **JavaScript (Vanilla)** — Logic & simulation
@@ -118,7 +118,7 @@ A Discrete Fourier Transform (DFT) is used to compute the signal spectrum.
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 ```bash
 git clone https://github.com/nishchay28/Aliasing-Simulator.git
@@ -128,7 +128,7 @@ Open `index.html` in browser.
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
 * Learning Digital Signal Processing (DSP)
 * Understanding Nyquist & aliasing visually
@@ -137,7 +137,7 @@ Open `index.html` in browser.
 
 ---
 
-## 📸 Screenshots
+## SnapShots
 
 ### NO Aliasing
 ![No Aliasing](./assets/CorrectSampling.png)
@@ -150,7 +150,7 @@ Open `index.html` in browser.
 
 ---
 
-## 🧩 Future Improvements
+## Future Improvements
 
 * Real FFT optimization
 * Audio signal input
@@ -159,12 +159,6 @@ Open `index.html` in browser.
 
 ---
 
-## 📜 License
-
-This project is open-source and available under the MIT License.
-
----
-
-## 👤 Author
+## Author
 
 Built as part of a hackathon project to demonstrate core signal processing concepts in an intuitive way.
