@@ -156,6 +156,9 @@
           <h1 class="text-lg md:text-xl font-bold text-foreground neon-text-cyan">
             Sampling & Aliasing Simulator
           </h1>
+          <p class="text-muted-foreground text-sm">
+            Visualizing how improper sampling causes frequency misinterpretation (aliasing)
+          </p>
         </div>
 
         <!-- Row 2: Controls (Sliders + Buttons) -->
@@ -169,6 +172,7 @@
               </label>
               <div class="flex items-center gap-3">
                 <input
+                class="transition-all duration-200"
                   type="range"
                   id="signal-frequency"
                   min="1"
@@ -189,6 +193,8 @@
               </label>
               <div class="flex items-center gap-3">
                 <input
+                
+                class="transition-all duration-200"
                   type="range"
                   id="sampling-rate"
                   min="1"
@@ -246,10 +252,6 @@
             <!-- Legend -->
             <div class="flex flex-wrap items-center gap-3 md:gap-4 text-xs md:text-sm">
               <div class="flex items-center gap-2">
-                <div class="w-4 h-0.5 bg-red-500 rounded-full"></div>
-                <span class="text-muted-foreground">Aliased Signal</span>
-              </div>
-              <div class="flex items-center gap-2">
                 <div class="w-4 h-0.5 bg-primary rounded-full"></div>
                 <span class="text-muted-foreground">Original Signal</span>
               </div>
@@ -261,11 +263,25 @@
                 <div class="w-4 h-0.5 bg-chart-3 rounded-full opacity-70"></div>
                 <span class="text-muted-foreground">Reconstructed</span>
               </div>
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-0.5 bg-red-500 rounded-full"></div>
+                <span class="text-muted-foreground">Aliased Signal</span>
+              </div>
             </div>
           </div>
 
+          
+
           <!-- Graph Container -->
           <div class="flex-1 relative bg-background/50 rounded-lg border border-border/50 overflow-visible graph-grid min-h-[300px]">
+            
+            <div id="explanation-box" class="mb-4 p-3 rounded-lg bg-background border border-border text-sm font-mono">
+              <span id="explanation-text" class="text-muted-foreground">
+                transition-all duration-30000
+                Adjust parameters to see sampling behavior
+            </span>
+          </div>
+
             <canvas id="timeCanvas" class="absolute inset-0 w-full h-full z-10"></canvas>
             <!-- Axis Labels -->
             <div class="absolute left-0 -translate-x-full top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground font-mono pl-2">

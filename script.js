@@ -80,6 +80,36 @@
     }
       drawSineWave(signalFreq, samplingRate, isAliasing, aliasFreq);
       document.getElementById("alias-frequency").textContent = aliasFreq.toFixed(1) + " Hz";
+
+      const explanation = document.getElementById("explanation-text");
+
+        if (samplingRate < 2 * signalFreq) {
+            if (samplingRate === signalFreq) {
+                explanation.textContent =
+                    "Critical sampling: signal collapses to DC (0 Hz)";
+            } else {
+                explanation.textContent =
+                    `Aliasing: ${signalFreq} Hz appears as ${aliasFreq.toFixed(1)} Hz`;
+            }
+        } else {
+            explanation.textContent =
+                "No aliasing: sampling rate is sufficient to preserve signal";
+        }
+
+        const explanation2 = document.getElementById("explanation-text");
+
+        if (samplingRate < 2 * signalFreq) {
+            if (samplingRate === signalFreq) {
+                explanation.textContent =
+                    "Critical Sampling → Signal collapses to 0 Hz";
+            } else {
+                explanation.textContent =
+                    `Aliasing Occurring → ${signalFreq} Hz is observed as ${aliasFreq.toFixed(1)} Hz`;
+            }
+        } else {
+            explanation.textContent =
+                "No Aliasing → Signal reconstructed correctly";
+        }
     }
 
     // Event listeners for sliders
@@ -123,7 +153,7 @@
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
-
+    ctx.globalAlpha = isAliasing ? 0.15 : 1;
     ctx.beginPath();
     ctx.lineWidth = 2;
     ctx.strokeStyle = "#22d3ee";
@@ -141,8 +171,8 @@
       if (x === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
-
     ctx.stroke();
+    ctx.globalAlpha = 1;
 
     // ===== DRAW SAMPLED POINTS =====
     const N = 128;
@@ -178,7 +208,7 @@
 
         // ===== RECONSTRUCTED SIGNAL (LINEAR INTERPOLATION) =====
         ctx.beginPath();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.strokeStyle = "#22c55e"; // green
 
         for (let i = 0; i < samples.length; i++) {
@@ -289,6 +319,16 @@
         freqCtx.fillRect(x, height - barHeight, 2, barHeight);
     }
 
+    freqCtx.fillStyle = "#e8dcdc";
+    freqCtx.font = "10px monospace";
+
+    for (let f = 0; f <= samplingRate / 2; f += 5) {
+        const padding = 20;
+        const x = padding + (f / (samplingRate / 2)) * (width - 2 * padding);
+
+        freqCtx.fillText(f + "Hz", x - 10, height - 5);
+    }
+
     // ===== Nyquist line =====
     freqCtx.beginPath();
     freqCtx.setLineDash([5, 5]);
@@ -307,4 +347,8 @@
   window.addEventListener("resize", drawSineWave);
 
    // Initialize
+   signalFreqSlider.value = 40;
+   samplingRateSlider.value = 30;
+
+   
     updateUI();
